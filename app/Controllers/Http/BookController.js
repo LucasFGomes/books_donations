@@ -59,7 +59,7 @@ class BookController {
     const book = await Book.find(book_id);
     if (!book) response.status(400).json({ error: "Livro não foi encontrado." });
 
-    const book_updated = await Book.query().where('id', '=', book_id).update({ donated: !book.donated });
+    const book_updated = await Book.query().where('id', '=', book_id).update({ donated: true });
 
     if (book_updated <= 0) response.json({ error: 'Erro ao atualizar o campo. ' });
 
