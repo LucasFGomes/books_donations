@@ -14,6 +14,7 @@ class BookController {
 
     const books = Book
       .query()
+      .with('user')
       .where({ has_interest: false, donated: false })
       .whereNotIn("donor_id", [donor_id])
       .fetch();
