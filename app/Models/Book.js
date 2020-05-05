@@ -11,6 +11,10 @@ class Book extends Model {
   donation() {
     return this.belongsTo("App/Models/Donation");
   }
+
+  pictures() {
+    return this.hasMany("App/Models/Picture")
+  }
 }
 
 module.exports = Book

@@ -2,6 +2,7 @@
 
 const Book = use('App/Models/Book');
 const User = use('App/Models/User');
+const Picture = use('App/Models/Picture');
 
 class BookController {
 
@@ -25,7 +26,8 @@ class BookController {
 
   async store({ request, response, params }) {
 
-    const data = request.all();
+    const { title, author, resume, year, credit, url } = request.all();
+
     const { donor_id } = params;
 
     if (!donor_id) response.status(400).json({ error: "Precisa ter um usuário para fazer uma doação." });
@@ -33,10 +35,13 @@ class BookController {
     const user = await User.find(donor_id);
     if (!user) response.status(400).json({ error: 'Usuário não encontrado.' });
 
-    const book = await Book.create({ ...data, donor_id });
+    const book = await Book.create({ title, author, resume, year, credit, donor_id });
+
+    if (url != '' && url.length > 1) {
+      url.map(async value => await Picture.create({ url: value, book_id: book.id }));
+    } 
 
     return book;
-
   }
 
   async registerInterest({ request, response, params }) {
