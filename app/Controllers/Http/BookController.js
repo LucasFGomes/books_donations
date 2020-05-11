@@ -15,9 +15,24 @@ class BookController {
 
     const books = Book
       .query()
-      .with('user')
+      .innerJoin('users', 'users.id', 'books.donor_id')
+      .innerJoin('cities', 'cities.id', 'users.city_id')
+      .innerJoin('states', 'states.id', 'cities.state_id')
       .where({ has_interest: false, donated: false })
       .whereNotIn("donor_id", [donor_id])
+      .select(
+        'books.*',
+        'users.name AS user_name',
+        'users.username',
+        'users.email',
+        'users.credits AS user_credits',
+        'users.points',
+        'users.phone',
+        'cities.id AS city_id',
+        'cities.name AS city_name',
+        'states.id AS state_id',
+        'states.name AS state_name',
+      )
       .fetch();
 
     return books;

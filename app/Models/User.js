@@ -42,6 +42,10 @@ class User extends Model {
   donation() {
     return this.belongsTo("App/Models/Donation", "receiver_id", "id");
   }
+
+  city() {
+    return this.belongsTo("App/Models/City");
+  }
 }
 
 module.exports = User

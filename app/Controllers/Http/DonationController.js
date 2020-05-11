@@ -12,6 +12,7 @@ class DonationController {
       .query()
       .with('book')
       .with('receiver')
+      .whereNot('status', 'canceled')
       .fetch();
 
     const total_completed = await this.total_donations_completed();
@@ -46,6 +47,8 @@ class DonationController {
     //   .fetch();
 
     const total_completed = await this.total_user_donations_completed(donor_id);
+    const total_received_pending = await this.total_donations_received_user_pending(donor_id);
+    const total_received_completed = await this.total_donations_received_user_completed(donor_id);
 
     const user_donations = await User
       .query()
@@ -53,12 +56,16 @@ class DonationController {
       .innerJoin('donations', 'books.id', 'donations.book_id')
       .innerJoin('users as user_receiver', 'user_receiver.id', 'donations.receiver_id')
       .where('users.id', donor_id)
+      .whereNot('donations.status', 'canceled')
       .select(
-        'donations.id',
+        'donations.id AS donation_id',
         'donations.status',
-        'donations.address',
         'donations.date_delivery',
+        'donations.receiver_id',
+        'books.id AS book_id',
+        'books.credit',
         'books.title AS book_title',
+        'books.donor_id',
         'users.name AS name_donor',
         'user_receiver.name AS name_receiver',
         'donations.created_at',
@@ -66,7 +73,7 @@ class DonationController {
       )
       .fetch();
 
-    return response.json({ user_donations, total_completed, total_pending });
+    return response.json({ user_donations, total_completed, total_pending, total_received_pending, total_received_completed });
 
   }
 
@@ -84,6 +91,45 @@ class DonationController {
 
     return donation;
 
+  }
+
+  async cancelDonation({ request, response, params }) {
+
+    const { donation_id } = params;
+
+    const numRowUpdated = await Donation.query().where('id', donation_id).update({ status: 'canceled' });
+
+    if (numRowUpdated == 1) {
+      return response.status(200).json({ message: 'Doação cancelada com sucesso.'});
+    } else {
+      return response.status(404).json({ error: 'Doação não existe.'});
+    }
+  }
+
+  async completeDonation({ request, response, params }) {
+
+    const { donation_id, donor_id } = params;
+    const { receiver_id, book_id, credit } = request.only(['receiver_id', 'book_id', 'credit']);
+
+    try {
+
+      const numRowUpdated = await Donation.query().where('id', donation_id).update({ status: 'completed' });
+
+      if (numRowUpdated == 1) {
+        const donorFound = await User.query().where('id', donor_id).first();
+        const receiverFound = await User.query().where('id', receiver_id).first();
+
+        await User.query().where('id', donorFound.id).update({ credits: donorFound.credits + credit });
+        await User.query().where('id', receiverFound.id).update({ credits: receiverFound.credits - credit });
+
+        return response.status(200).json({ message: 'Doação concluida com sucesso. ' });
+      } else {
+        return response.json({ error: 'Não foi possível concluir a doação.'});
+      }
+    } catch(err) {
+      console.log('Error: ', err)
+      return response.json({ error: err });
+    }
   }
 
   async total_donations_completed() {
@@ -125,6 +171,28 @@ class DonationController {
       .innerJoin('books', 'users.id', 'books.donor_id')
       .innerJoin('donations', 'books.id', 'donations.book_id')
       .where({ 'users.id': donor_id, 'donations.status': 'processing' })
+      .count('* as total');
+
+    return parseInt(count[0].total);
+  }
+
+  async total_donations_received_user_pending(donor_id) {
+    const count = await User
+      .query()
+      .innerJoin('books', 'users.id', 'books.donor_id')
+      .innerJoin('donations', 'books.id', 'donations.book_id')
+      .where({ 'donations.receiver_id': donor_id, 'donations.status': 'processing' })
+      .count('* as total');
+
+    return parseInt(count[0].total);
+  }
+
+  async total_donations_received_user_completed(donor_id) {
+    const count = await User
+      .query()
+      .innerJoin('books', 'users.id', 'books.donor_id')
+      .innerJoin('donations', 'books.id', 'donations.book_id')
+      .where({ 'donations.receiver_id': donor_id, 'donations.status': 'completed' })
       .count('* as total');
 
     return parseInt(count[0].total);

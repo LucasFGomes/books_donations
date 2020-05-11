@@ -18,12 +18,15 @@ const Route = use('Route')
 
 Route.post('/register', 'UserController.register');
 Route.post('/auth', 'UserController.auth');
+Route.put('/users/:id', 'UserController.increaseCredit').middleware(['auth']);
 
 Route.get('/users/:donor_id/books', 'BookController.index').middleware(['auth']);
 Route.post('/users/:donor_id/books', 'BookController.store').middleware(['auth']);
 Route.put('/users/books/:book_id', 'BookController.registerInterest').middleware(['auth']);
 Route.put('/users/books/:book_id/donations', 'BookController.registerDonation').middleware(['auth']);
 
-Route.get('/users/donations', 'DonationController.index').middleware(['auth']);
-Route.get('/users/:donor_id/donations', 'DonationController.show').middleware(['auth']);
-Route.post('/users/donations', 'DonationController.store').middleware(['auth']);
+Route.get('/users/books/donations', 'DonationController.index').middleware(['auth']);
+Route.get('/users/:donor_id/books/donations', 'DonationController.show').middleware(['auth']);
+Route.put('/users/:donor_id/books/donations/:donation_id', 'DonationController.completeDonation').middleware(['auth']);
+Route.delete('/users/books/donations/:donation_id', 'DonationController.cancelDonation').middleware(['auth']);
+Route.post('/users/books/donations', 'DonationController.store').middleware(['auth']);
