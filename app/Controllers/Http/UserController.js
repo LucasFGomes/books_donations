@@ -6,6 +6,14 @@ const StateController = use('App/Controllers/Http/StateController');
 const CityController = use('App/Controllers/Http/CityController');
 
 class UserController {
+  async index({ params }) {
+    const { id } = params;
+
+    const user = await User.query().where('id', id).select('id', 'name', 'email', 'credits', 'points').first();
+
+    return user;
+  }
+
   async register({ request }) {
 
     const data = request.only(['name', 'username', 'email', 'password', 'credits', 'points']);
