@@ -64,7 +64,7 @@ class UserController {
 
     if (numRowUpdated <= 0) response.json({ error: "Erro ao dar a nota. " });
 
-    return response.status(200).json({ message: "Nota cadastrada com sucesso." });
+    return response.status(200).json({ message: "Avaliação cadastrada com sucesso." });
   }
 }
 

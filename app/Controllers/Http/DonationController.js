@@ -77,6 +77,7 @@ class DonationController {
         "donations.created_at",
         "donations.updated_at"
       )
+      .orderByRaw('donations.status DESC')
       .fetch();
 
     const user_receipts = await User.query()
@@ -107,6 +108,7 @@ class DonationController {
         "donations.created_at",
         "donations.updated_at"
       )
+      .orderByRaw('donations.status DESC')
       .fetch();
 
     return response.json({
