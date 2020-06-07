@@ -20,6 +20,7 @@ Route.get('/users/:id', 'UserController.index')
 Route.post('/register', 'UserController.register');
 Route.post('/auth', 'UserController.auth');
 Route.put('/users/:id', 'UserController.increaseCredit').middleware(['auth']);
+Route.put('/users', 'UserController.giveNote').middleware(['auth']);
 
 Route.get('/users/:donor_id/books', 'BookController.index').middleware(['auth']);
 Route.post('/users/:donor_id/books', 'BookController.store').middleware(['auth']);

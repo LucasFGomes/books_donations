@@ -44,6 +44,21 @@ class UserController {
 
     return await User.query().where('id', id).update({ credits: credit });
   }
+
+  async giveNote({ request, response, params }) {
+
+    const { note, userId } = request.only(['note', 'userId']);
+
+    const { sum_notes, count_note } = await User.query().where('id', userId).select('sum_notes', 'count_note').first();
+    const newSumNotes = (sum_notes + note);
+    const newPoints = newSumNotes / (count_note + 1) 
+
+    const numRowUpdated = await User.query().where('id', userId).update({ points: newPoints.toFixed(2), sum_notes: newSumNotes, count_note: count_note + 1})
+
+    if (numRowUpdated <= 0) response.json({ error: "Erro ao dar a nota. " });
+
+    return response.status(200).json({ message: "Nota cadastrada com sucesso." });
+  }
 }
 
 module.exports = UserController
