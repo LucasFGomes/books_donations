@@ -51,9 +51,9 @@ class UserController {
     const { note, donationId, ratedUserId, donor } = request.only(['note', 'donationId', 'ratedUserId', 'donor']);
 
     if (donor) {
-      await Donation.query().where('id', donationId).update({ donor_evaluation: true });
+      await Donation.query().where('id', donationId).update({ donor_evaluation: true, donor_note: note });
     } else {
-      await Donation.query().where('id', donationId).update({ receiver_evaluation: true });
+      await Donation.query().where('id', donationId).update({ receiver_evaluation: true, receiver_note: note });
     }
 
     const { sum_notes, count_note } = await User.query().where('id', ratedUserId).select('sum_notes', 'count_note').first();
