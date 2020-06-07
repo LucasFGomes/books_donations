@@ -1,6 +1,7 @@
 'use strict'
 
 const User = use('App/Models/User');
+const Donation = use('App/Models/Donation');
 
 const StateController = use('App/Controllers/Http/StateController');
 const CityController = use('App/Controllers/Http/CityController');
@@ -47,13 +48,19 @@ class UserController {
 
   async giveNote({ request, response, params }) {
 
-    const { note, userId } = request.only(['note', 'userId']);
+    const { note, donationId, ratedUserId, donor } = request.only(['note', 'donationId', 'ratedUserId', 'donor']);
 
-    const { sum_notes, count_note } = await User.query().where('id', userId).select('sum_notes', 'count_note').first();
+    if (donor) {
+      await Donation.query().where('id', donationId).update({ donor_evaluation: true });
+    } else {
+      await Donation.query().where('id', donationId).update({ receiver_evaluation: true });
+    }
+
+    const { sum_notes, count_note } = await User.query().where('id', ratedUserId).select('sum_notes', 'count_note').first();
     const newSumNotes = (sum_notes + note);
     const newPoints = newSumNotes / (count_note + 1) 
 
-    const numRowUpdated = await User.query().where('id', userId).update({ points: newPoints.toFixed(2), sum_notes: newSumNotes, count_note: count_note + 1})
+    const numRowUpdated = await User.query().where('id', ratedUserId).update({ points: newPoints.toFixed(2), sum_notes: newSumNotes, count_note: count_note + 1})
 
     if (numRowUpdated <= 0) response.json({ error: "Erro ao dar a nota. " });
 
