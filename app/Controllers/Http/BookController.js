@@ -45,6 +45,7 @@ class BookController {
         "books.id",
         "books.title",
         "books.author",
+        "books.credit",
         "books.created_at",
         "users.name",
         "users.points"
