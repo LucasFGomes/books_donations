@@ -15,7 +15,22 @@ class DonationController {
     const total_completed = await this.total_donations_completed();
     const total_pending = await this.total_donations_pending();
 
-    return response.json({ donations, total_completed, total_pending });
+    const pie_chart_donations = {
+      labels: [' Concluídas',' Em Análise'],
+      datasets: [{
+        data: [total_completed, total_pending],
+        backgroundColor: [
+          "#36A2EB",
+          "#FFCE56"
+        ],
+        hoverBackgroundColor: [
+          "#1f9cf0",
+          "#ffc840",
+        ]
+      }]
+    };
+
+    return response.json({ donations, total_completed, total_pending, pie_chart_donations });
   }
 
   async show({ response, params }) {

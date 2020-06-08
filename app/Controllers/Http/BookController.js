@@ -39,12 +39,15 @@ class BookController {
 
   async recentRegisterBooks({ request, response }) {
     const books = await Book.query()
+      .innerJoin("users", "users.id", "books.donor_id")
       .where({ has_interest: false, donated: false })
       .select(
         "books.id",
         "books.title",
         "books.author",
-        "books.created_at"
+        "books.created_at",
+        "users.name",
+        "users.points"
       )
       .orderByRaw("books.created_at DESC")
       .limit(5)
