@@ -23,6 +23,7 @@ Route.put('/users/:id', 'UserController.increaseCredit').middleware(['auth']);
 Route.put('/users', 'UserController.giveNote').middleware(['auth']);
 
 Route.get('/users/:donor_id/books', 'BookController.index').middleware(['auth']);
+Route.get('/users/donor/new_books', 'BookController.recentRegisterBooks').middleware(['auth']);
 Route.post('/users/:donor_id/books', 'BookController.store').middleware(['auth']);
 Route.put('/users/books/:book_id', 'BookController.registerInterest');
 Route.put('/users/books/:book_id/donations', 'BookController.registerDonation');

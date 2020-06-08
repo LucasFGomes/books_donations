@@ -111,6 +111,36 @@ class DonationController {
       .orderByRaw('donations.status DESC')
       .fetch();
 
+    const pie_chart_donations = {
+      labels: [' Concluídas',' Em Análise'],
+      datasets: [{
+        data: [total_completed, total_pending],
+        backgroundColor: [
+          "#36A2EB",
+          "#FFCE56"
+        ],
+        hoverBackgroundColor: [
+          "#1f9cf0",
+          "#ffc840",
+        ]
+      }]
+    };
+
+    const pie_chart_receipts = {
+      labels: [' Concluídas',' Em Análise'],
+      datasets: [{
+        data: [total_received_completed, total_received_pending],
+        backgroundColor: [
+          "#36A2EB",
+          "#FFCE56",
+        ],
+        hoverBackgroundColor: [
+          "#1f9cf0",
+          "#ffc840",
+        ]
+      }]
+    };
+
     return response.json({
       user_donations,
       user_receipts,
@@ -118,6 +148,8 @@ class DonationController {
       total_pending,
       total_received_pending,
       total_received_completed,
+      pie_chart_receipts,
+      pie_chart_donations,
     });
   }
 

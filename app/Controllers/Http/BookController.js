@@ -37,6 +37,22 @@ class BookController {
     return books;
   }
 
+  async recentRegisterBooks({ request, response }) {
+    const books = await Book.query()
+      .where({ has_interest: false, donated: false })
+      .select(
+        "books.id",
+        "books.title",
+        "books.author",
+        "books.created_at"
+      )
+      .orderByRaw("books.created_at DESC")
+      .limit(5)
+      .fetch();
+
+    return books;
+  }
+
   async store({ request, response, params }) {
     const { title, author, resume, year, credit, url } = request.all();
 
